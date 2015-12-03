@@ -6,8 +6,6 @@ class Scraper
   class << self
     def address_geo_data_in(url)
       html, _charset = get_html(url)
-      # address_list = scan_address(html)     
-      # get_geo_data(address_list)
       scan_address(html)
     end
 
@@ -25,10 +23,6 @@ class Scraper
     def scan_address(html)
       html.scan(/<dt>住所<\/dt>\n<dd>(.*)\(.*\)<\/dd>/).flatten
     end
-
-    # def get_geo_data(address_list)     
-    #   address_list
-    # end
   end
 end
 
