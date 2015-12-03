@@ -1,8 +1,21 @@
-:sass
-  h1
-    color: red
+!!!
+%html{lang: "ja"}
+  %head
+    %meta{charset: "utf-8"}
 
-:javascript
-  alert('Hello!');
+    :sass
+      html, body
+        height: 100%
+        margin: 0
+        padding: 0
+      #map
+        height: 100%
 
-%h1=@mes
+    :javascript
+      var addressList = #{@address_list};
+
+  %body
+    %div{id: 'map'}
+    %h1=@mes
+    %script{type: 'text/javascript', src: "//maps.google.com/maps/api/js?key=#{ENV['API_KEY']}"}
+    %script{type: 'text/javascript', src: './app.js'}
