@@ -1,14 +1,16 @@
 // app.js
-function getLocations(address) {
+function getLocations(restaurant) {
+  var name    = restaurant[0];
+  var address = restaurant[1];
   var geocoder = new google.maps.Geocoder();
   var promise = new Promise(function(resolve, reject) {
     geocoder.geocode({
-      address: addressList[i],
+      address: address,
       region: 'jp'
     },
     function (results, status) {
       if (status === google.maps.GeocoderStatus.OK) {
-        resolve(results[0].geometry.location);
+        resolve([name, results[0].geometry.location]);
       } else {
         reject(status);
       }
@@ -17,39 +19,53 @@ function getLocations(address) {
   return promise;
 }
 
-function drawMap(locations) {
-  console.log(locations);
-  google.maps.event.addDomListener(window, 'load', function() {
-    var mapTag = document.getElementById('map');
-    var centerPosition = new google.maps.LatLng(locations[0].lat(), locations[0].lng());
-    var mapOptions = {
-      zoom: 15,
-      center: centerPosition,
-      disableDefaultUI: true,
-      mapTypeID: google.maps.MapTypeId.ROADMAP
-    };
+function drawMap(markerData, map) {
+  var name     = markerData[0];
+  var location = markerData[1];
+  var mapTag = document.getElementById('map');
+  var position = new google.maps.LatLng(location.lat(), location.lng());
+  var mapOptions = {
+    zoom: 15,
+    center: position,
+    disableDefaultUI: true,
+    mapTypeID: google.maps.MapTypeId.ROADMAP
+  };
 
-    var map = new google.maps.Map(mapTag, mapOptions);
+  map = new google.maps.Map(mapTag, mapOptions);
 
-    var markers = [];
-    for (var i in locations) {
-      var position = new google.maps.LatLng(locations[i].lat(), locations[i].lng());
-      markers.push(new google.maps.Marker({
-        position: position,
-        map: map
-      }));
-    }
+  console.log(name);
+  new google.maps.Marker({
+    position: position,
+    map: map,
+    title: name
   });
+  return map;
 }
 
-var promiseList = [];
+function addMarker(markerDatas, map) {
+  for (var i in markerDatas) {
+    new google.maps.Marker({
+      map: map,
+      position: markerDatas[i][1],
+      title: markerDatas[i][0]
+    });
+  }
+}
 
-for (var i in addressList) {
-  promiseList.push(getLocations(addressList[i]));
+// 初期表示
+var map = null;
+var firstPromise = getLocations(restaurants.shift());
+firstPromise.then(function(markerData) {
+  map = drawMap(markerData, map);
+});
+
+var promiseList = [];
+for (var i in restaurants) {
+  promiseList.push(getLocations(restaurants[i]));
 }
 
 Promise.all(promiseList)
-  .then(function(locations) {
-    drawMap(locations);
+  .then(function(markerDatas) {
+    addMarker(markerDatas, map);
   });
 
