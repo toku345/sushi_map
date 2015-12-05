@@ -20,35 +20,48 @@ function getLocations(restaurant) {
 }
 
 function drawMap(markerData, map) {
-  var name     = markerData[0];
   var location = markerData[1];
   var mapTag = document.getElementById('map');
   var position = new google.maps.LatLng(location.lat(), location.lng());
   var mapOptions = {
-    zoom: 15,
+    zoom: 16,
     center: position,
     disableDefaultUI: true,
     mapTypeID: google.maps.MapTypeId.ROADMAP
   };
 
   map = new google.maps.Map(mapTag, mapOptions);
+  addMarker(markerData, map);
 
-  console.log(name);
-  new google.maps.Marker({
-    position: position,
-    map: map,
-    title: name
-  });
   return map;
 }
 
-function addMarker(markerDatas, map) {
+function generatgeContentStr(markerData) {
+  var contentStr = "";
+  contentStr += "<bold>" + markerData[0] + "</bold>";
+  return contentStr;
+}
+
+function addMarker(markerData, map) {
+  var contentStr = generatgeContentStr(markerData);
+  var infowindow = new google.maps.InfoWindow({
+    content: contentStr
+  });
+
+  var marker = new google.maps.Marker({
+    map: map,
+    position: markerData[1],
+    title: markerData[0]
+  });
+  marker.addListener('click', function() {
+    infowindow.open(map, marker);
+  });
+}
+
+function addMarkers(markerDatas, map) {
+  console.log(markerDatas);
   for (var i in markerDatas) {
-    new google.maps.Marker({
-      map: map,
-      position: markerDatas[i][1],
-      title: markerDatas[i][0]
-    });
+    addMarker(markerDatas[i], map);
   }
 }
 
@@ -66,6 +79,6 @@ for (var i in restaurants) {
 
 Promise.all(promiseList)
   .then(function(markerDatas) {
-    addMarker(markerDatas, map);
+    addMarkers(markerDatas, map);
   });
 
