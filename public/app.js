@@ -1,5 +1,5 @@
 // app.js
-function getLocations(restaurant) {
+function getLocation(restaurant) {
   var name    = restaurant[0];
   var address = restaurant[1];
   var geocoder = new google.maps.Geocoder();
@@ -58,6 +58,14 @@ function addMarker(markerData, map) {
   });
 }
 
+// function addCurrentPosMarker(navigationPosition) {
+//   var marker = new google.maps.Marker({
+//     map: map,
+//     position: markerData[1],
+//     title: markerData[0]
+//   });
+// }
+
 function addMarkers(markerDatas, map) {
   console.log(markerDatas);
   for (var i in markerDatas) {
@@ -67,14 +75,28 @@ function addMarkers(markerDatas, map) {
 
 // 初期表示
 var map = null;
-var firstPromise = getLocations(restaurants.shift());
+var firstPromise = getLocation(restaurants.shift());
 firstPromise.then(function(markerData) {
   map = drawMap(markerData, map);
+
+  // 現在地 (現在地が表示できるときのみ表示する)
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      // ON SUCCESS
+      var position = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+      addMarker(['現在地', position], map);
+    }, function (error) {
+      // ON ERROR
+      console.log('以下のエラーにより現在地の取得に失敗しました。: ' + error);
+    });
+  } else {
+      console.log('位置情報が許可されていません。。。');
+  }
 });
 
 var promiseList = [];
 for (var i in restaurants) {
-  promiseList.push(getLocations(restaurants[i]));
+  promiseList.push(getLocation(restaurants[i]));
 }
 
 Promise.all(promiseList)
