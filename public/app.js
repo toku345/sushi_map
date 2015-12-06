@@ -68,7 +68,6 @@ function addCurrentPosMarker(markerData, map) {
 }
 
 function addMarkers(markerDatas, map) {
-  console.log(markerDatas);
   for (var i in markerDatas) {
     addMarker(markerDatas[i], map);
   }
@@ -88,6 +87,7 @@ firstPromise.then(function(markerData) {
       var position = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
       // addMarker(['現在地', position], map);
       currentPosMarker = addCurrentPosMarker(['現在地', position], map);
+      map.setCenter(position);
     }, function (error) {
       // ON ERROR
       console.log('以下のエラーにより現在地の取得に失敗しました。: ' + error);
