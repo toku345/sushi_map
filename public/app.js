@@ -58,13 +58,14 @@ function addMarker(markerData, map) {
   });
 }
 
-// function addCurrentPosMarker(navigationPosition) {
-//   var marker = new google.maps.Marker({
-//     map: map,
-//     position: markerData[1],
-//     title: markerData[0]
-//   });
-// }
+function addCurrentPosMarker(markerData, map) {
+  return new google.maps.Marker({
+    map: map,
+    position: markerData[1],
+    title: markerData[0],
+    icon: 'my_marker.png'
+  });
+}
 
 function addMarkers(markerDatas, map) {
   console.log(markerDatas);
@@ -75,6 +76,7 @@ function addMarkers(markerDatas, map) {
 
 // 初期表示
 var map = null;
+var currentPosMarker = null;
 var firstPromise = getLocation(restaurants.shift());
 firstPromise.then(function(markerData) {
   map = drawMap(markerData, map);
@@ -84,7 +86,8 @@ firstPromise.then(function(markerData) {
     navigator.geolocation.getCurrentPosition(function (pos) {
       // ON SUCCESS
       var position = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
-      addMarker(['現在地', position], map);
+      // addMarker(['現在地', position], map);
+      currentPosMarker = addCurrentPosMarker(['現在地', position], map);
     }, function (error) {
       // ON ERROR
       console.log('以下のエラーにより現在地の取得に失敗しました。: ' + error);
